@@ -7,7 +7,9 @@ use std::{
 };
 
 use crossterm::{
-    event::{self, EnableMouseCapture, Event, KeyCode, KeyEventKind, MouseEventKind, DisableMouseCapture},
+    event::{
+        self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEventKind, MouseEventKind,
+    },
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
@@ -24,13 +26,12 @@ pub fn run(tick_rate: Duration, receiver: Receiver<String>) -> Result<(), Box<dy
         let rt = runtime::Runtime::new().expect("Failed to create Tokio runtime.");
         rt.block_on(process_messages(receiver));
     });
-    
-    
+
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
-    
+
     let app = App::new("jamespy client (ip-address)");
     let res = run_app(&mut terminal, app, tick_rate);
 
@@ -52,7 +53,7 @@ pub fn run(tick_rate: Duration, receiver: Receiver<String>) -> Result<(), Box<dy
 fn run_app<B: Backend>(
     terminal: &mut Terminal<B>,
     mut app: App,
-    tick_rate: Duration
+    tick_rate: Duration,
 ) -> io::Result<()> {
     let mut last_tick = Instant::now();
     loop {

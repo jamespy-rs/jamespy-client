@@ -54,12 +54,6 @@ impl<'a> App<'a> {
             'q' => {
                 self.should_quit = true;
             }
-            'a' => {
-                println!();
-                let mut messages = MESSAGES.lock().unwrap();
-                println!("{:?}", messages)
-            }
-
             _ => {}
         }
     }

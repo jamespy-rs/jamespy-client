@@ -1,10 +1,6 @@
-use ratatui::{
-    prelude::*,
-    widgets::{canvas::*, *},
-};
+use ratatui::{prelude::*, widgets::*};
 
 use crate::app::{App, MESSAGES};
-
 
 pub fn draw(f: &mut Frame, app: &mut App) {
     let chunks = Layout::default()
@@ -39,10 +35,11 @@ fn draw_first_tab(f: &mut Frame, app: &mut App, area: Rect) {
 fn draw_events(f: &mut Frame, _app: &mut App, area: Rect) {
     // Lock the mutex to access the vector of strings
     let messages = MESSAGES.lock().unwrap();
-    let text: Vec<text::Line> = messages.clone()
-    .into_iter()
-    .map(|line| text::Line::from(line))
-    .collect();
+    let text: Vec<text::Line> = messages
+        .clone()
+        .into_iter()
+        .map(text::Line::from)
+        .collect();
 
     let block = Block::default().borders(Borders::ALL).title(Span::styled(
         "Events",
@@ -51,7 +48,6 @@ fn draw_events(f: &mut Frame, _app: &mut App, area: Rect) {
             .add_modifier(Modifier::BOLD),
     ));
 
-    // Create a Paragraph with the vector of Text objects
     let paragraph = Paragraph::new(text).block(block).wrap(Wrap { trim: true });
     f.render_widget(paragraph, area);
 }
