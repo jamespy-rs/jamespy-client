@@ -1,5 +1,6 @@
 pub mod app;
 pub mod crossterm;
+mod event_handlers;
 pub mod ui;
 
 use futures_util::StreamExt;
