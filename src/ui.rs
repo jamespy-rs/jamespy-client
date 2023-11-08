@@ -36,7 +36,7 @@ fn draw_events(f: &mut Frame, _app: &mut App, area: Rect) {
     let messages = MESSAGES.lock().unwrap();
     let text = messages.clone();
     let block = Block::default().borders(Borders::ALL).title(Span::styled(
-        "Events", 
+        "Events",
         Style::default()
             .fg(Color::Magenta)
             .add_modifier(Modifier::BOLD),

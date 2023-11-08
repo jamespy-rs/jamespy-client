@@ -34,7 +34,6 @@ lazy_static! {
     pub static ref MESSAGES: Mutex<Vec<text::Line<'static>>> = Mutex::new(Vec::new());
 }
 
-
 impl<'a> App<'a> {
     pub fn new(title: &'a str) -> App<'a> {
         App {
