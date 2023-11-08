@@ -33,16 +33,10 @@ fn draw_first_tab(f: &mut Frame, app: &mut App, area: Rect) {
 
 // the events on the first page.
 fn draw_events(f: &mut Frame, _app: &mut App, area: Rect) {
-    // Lock the mutex to access the vector of strings
     let messages = MESSAGES.lock().unwrap();
-    let text: Vec<text::Line> = messages
-        .clone()
-        .into_iter()
-        .map(text::Line::from)
-        .collect();
-
+    let text = messages.clone();
     let block = Block::default().borders(Borders::ALL).title(Span::styled(
-        "Events",
+        "Events", 
         Style::default()
             .fg(Color::Magenta)
             .add_modifier(Modifier::BOLD),

@@ -14,6 +14,7 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use ratatui::prelude::*;
+use serenity::model::guild;
 use tokio::runtime;
 
 use crate::{app::App, ui, WebSocketEvent};
@@ -86,19 +87,20 @@ use crate::app::MESSAGES;
 
 async fn process_messages(receiver: mpsc::Receiver<String>) {
     while let Ok(message) = receiver.recv() {
-
         if let Ok(event) = serde_json::from_str::<WebSocketEvent>(&message) {
             match event {
-                WebSocketEvent::NewMessage { message, guild_name, channel_name } => {
-                    let a = format!(
-                        "[{}] [#{}] {}: {}",
-                        guild_name,
-                        channel_name,
-                        message.author.name,
-                        message.content,
-                    );
+                WebSocketEvent::NewMessage {
+                    message,
+                    guild_name,
+                    channel_name,
+                } => {
+                    let msg = text::Line::from(vec![
+                        Span::styled(format!("[{}] [#{}] ", guild_name, channel_name), Style::default().fg(Color::DarkGray)),
+                        Span::raw(format!("{}: {}", message.author.name, message.content))
+                    ]);
+                    // handle attachments
                     let mut handle = MESSAGES.lock().unwrap();
-                    handle.push(a)
+                    handle.push(msg)
                 }
             }
         }
