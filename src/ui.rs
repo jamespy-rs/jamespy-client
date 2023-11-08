@@ -48,6 +48,6 @@ fn draw_events(f: &mut Frame, _app: &mut App, area: Rect) {
             .add_modifier(Modifier::BOLD),
     ));
 
-    let paragraph = Paragraph::new(text).block(block).wrap(Wrap { trim: true });
+    let paragraph = Paragraph::new(text).block(block).wrap(Wrap { trim: false });
     f.render_widget(paragraph, area);
 }

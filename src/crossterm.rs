@@ -16,7 +16,7 @@ use crossterm::{
 use ratatui::prelude::*;
 use tokio::runtime;
 
-use crate::{app::App, ui};
+use crate::{app::App, ui, WebSocketEvent};
 use std::sync::mpsc::Receiver;
 
 pub fn run(tick_rate: Duration, receiver: Receiver<String>) -> Result<(), Box<dyn Error>> {
@@ -61,13 +61,6 @@ fn run_app<B: Backend>(
 
         let timeout = tick_rate.saturating_sub(last_tick.elapsed());
         if crossterm::event::poll(timeout)? {
-            if let Event::Mouse(key) = event::read()? {
-                match key.kind {
-                    MouseEventKind::ScrollUp => todo!(),
-                    MouseEventKind::ScrollDown => todo!(),
-                    _ => {}
-                }
-            }
             if let Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {
                     match key.code {
@@ -93,9 +86,21 @@ use crate::app::MESSAGES;
 
 async fn process_messages(receiver: mpsc::Receiver<String>) {
     while let Ok(message) = receiver.recv() {
-        let mut handle = MESSAGES.lock().unwrap();
-        handle.push(message)
-        // how do I get this over to where it draws?
-        // I just want to add messages to app.messages...
+
+        if let Ok(event) = serde_json::from_str::<WebSocketEvent>(&message) {
+            match event {
+                WebSocketEvent::NewMessage { message, guild_name, channel_name } => {
+                    let a = format!(
+                        "[{}] [#{}] {}: {}",
+                        guild_name,
+                        channel_name,
+                        message.author.name,
+                        message.content,
+                    );
+                    let mut handle = MESSAGES.lock().unwrap();
+                    handle.push(a)
+                }
+            }
+        }
     }
 }
