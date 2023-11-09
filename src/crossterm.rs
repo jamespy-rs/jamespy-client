@@ -7,16 +7,14 @@ use std::{
 };
 
 use crossterm::{
-    event::{
-        self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEventKind, MouseEventKind,
-    },
+    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEventKind},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use ratatui::prelude::*;
 use tokio::runtime;
 
-use crate::{app::App, event_handlers, ui, WebSocketEvent};
+use crate::{app::App, event::WebSocketEvent, event_handlers, ui};
 use std::sync::mpsc::Receiver;
 
 pub fn run(tick_rate: Duration, receiver: Receiver<String>) -> Result<(), Box<dyn Error>> {
@@ -82,8 +80,6 @@ fn run_app<B: Backend>(
     }
 }
 
-use crate::app::MESSAGES;
-
 async fn process_messages(receiver: mpsc::Receiver<String>) {
     while let Ok(message) = receiver.recv() {
         if let Ok(event) = serde_json::from_str::<WebSocketEvent>(&message) {
@@ -93,8 +89,25 @@ async fn process_messages(receiver: mpsc::Receiver<String>) {
                     guild_name,
                     channel_name,
                 } => {
-                    event_handlers::new_message(message, guild_name, channel_name).await;
+                    let _ = event_handlers::new_message(message, guild_name, channel_name).await;
                 }
+                WebSocketEvent::MessageEdit {
+                    old_if_available,
+                    new,
+                    event,
+                    channel_name,
+                    guild_name,
+                } => {
+                    let _ = event_handlers::message_edit(
+                        old_if_available,
+                        new,
+                        event,
+                        guild_name,
+                        channel_name,
+                    )
+                    .await;
+                }
+                _ => {}
             }
         }
     }

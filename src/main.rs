@@ -1,20 +1,12 @@
 pub mod app;
 pub mod crossterm;
+pub mod event;
 mod event_handlers;
 pub mod ui;
 
 use futures_util::StreamExt;
-use serde_derive::{Deserialize, Serialize};
 use std::{error::Error, sync::mpsc, time::Duration};
 use tokio_tungstenite::{connect_async, WebSocketStream};
-#[derive(Serialize, Deserialize, Debug)]
-enum WebSocketEvent {
-    NewMessage {
-        message: serenity::model::channel::Message,
-        guild_name: String,
-        channel_name: String,
-    },
-}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {

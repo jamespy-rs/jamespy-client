@@ -31,7 +31,7 @@ use lazy_static::lazy_static;
 use ratatui::text;
 
 lazy_static! {
-    pub static ref MESSAGES: Mutex<Vec<text::Line<'static>>> = Mutex::new(Vec::new());
+    pub static ref MESSAGES: Mutex<Vec<Vec<text::Line<'static>>>> = Mutex::new(Vec::new());
 }
 
 impl<'a> App<'a> {

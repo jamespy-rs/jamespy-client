@@ -34,7 +34,12 @@ fn draw_first_tab(f: &mut Frame, app: &mut App, area: Rect) {
 // the events on the first page.
 fn draw_events(f: &mut Frame, _app: &mut App, area: Rect) {
     let messages = MESSAGES.lock().unwrap();
-    let text = messages.clone();
+    let text: Vec<Line<'_>> = messages
+        .iter()
+        .flat_map(|lines| lines.iter())
+        .cloned()
+        .collect();
+
     let block = Block::default().borders(Borders::ALL).title(Span::styled(
         "Events",
         Style::default()
