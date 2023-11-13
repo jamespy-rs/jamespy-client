@@ -10,7 +10,7 @@ use tokio_tungstenite::{connect_async, WebSocketStream};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let (ws_stream, _) = connect_async("ws://127.0.0.1:8080")
+    let (ws_stream, _) = connect_async("ws://192.168.0.113:8080")
         .await
         .expect("Failed to connect to WebSocket server");
 

@@ -32,12 +32,10 @@ pub async fn new_message(
 
     let mut lines: Vec<text::Line> = Vec::new();
     let total_lines = message.content.lines().count();
-    
+
     for (index, line) in message.content.lines().enumerate() {
-        let mut formatted_line = vec![
-            Span::raw(format!("{}", line)),
-        ];
-    
+        let mut formatted_line = vec![Span::raw(format!("{}", line))];
+
         if index == 0 {
             formatted_line.insert(
                 0,
@@ -46,8 +44,9 @@ pub async fn new_message(
                     Style::default().fg(Color::DarkGray),
                 ),
             );
+            formatted_line.insert(1, Span::from(format!("{}: ", message.author.name)))
         }
-    
+
         if index == total_lines - 1 {
             formatted_line.push(Span::styled(
                 format!(
@@ -58,12 +57,12 @@ pub async fn new_message(
                 Style::default().fg(Color::Cyan),
             ));
         }
-    
+
         lines.push(text::Line::from(formatted_line));
     }
-    
+
     let msg = lines;
-    
+
     // handle bad words
     let mut handle = MESSAGES.lock().unwrap();
     handle.push(msg);
@@ -145,23 +144,22 @@ pub async fn message_edit(
                     } else {
                         String::new()
                     };
-                    let suffix = if index == new_content_lines.len() -1 {
-                        format!("{}{}", attachments_fmt.as_deref().unwrap_or(""), embeds_fmt.as_deref().unwrap_or(""))
+                    let suffix = if index == new_content_lines.len() - 1 {
+                        format!(
+                            "{}{}",
+                            attachments_fmt.as_deref().unwrap_or(""),
+                            embeds_fmt.as_deref().unwrap_or("")
+                        )
                     } else {
-                        String::new()
+                        String::new() 
                     };
                     let line_span = Span::styled(
-                        format!(
-                            "{}{}{}",
-                            prefix,
-                            line,
-                            suffix
-                        ),
+                        format!("{}{}{}", prefix, line, suffix),
                         Style::default().fg(Color::Cyan),
                     );
                     msg.push(text::Line::from(vec![line_span]));
                 }
-                
+
                 // Maybe check old embeds and or attachments in the future, requires a big rewrite to this.
                 let mut handle = MESSAGES.lock().unwrap();
                 handle.push(msg);
