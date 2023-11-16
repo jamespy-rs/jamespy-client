@@ -22,6 +22,8 @@ impl<'a> TabsState<'a> {
 pub struct App<'a> {
     pub title: &'a str,
     pub should_quit: bool,
+    pub logs_border: bool,
+    pub show_tabs: bool,
     pub tabs: TabsState<'a>,
     pub vertical_scroll_state: ScrollbarState,
     pub vertical_scroll: usize,
@@ -41,6 +43,8 @@ impl<'a> App<'a> {
         App {
             title,
             should_quit: false,
+            logs_border: false,
+            show_tabs: false,
             tabs: TabsState::new(vec!["Events", "Placeholder", "Placeholder"]),
             vertical_scroll_state: ScrollbarState::default(),
             vertical_scroll: 0,
@@ -71,6 +75,8 @@ impl<'a> App<'a> {
             }
             'j' => self.scroll_up(),
             'k' => self.scroll_down(),
+            'e' => self.logs_border = !self.logs_border,
+            'r' => self.show_tabs = !self.show_tabs,
             _ => {}
         }
     }

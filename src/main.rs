@@ -20,7 +20,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         handle_websocket_events(ws_stream, ws_sender).await;
     });
 
-    let tick_rate = Duration::from_millis(25);
+    let tick_rate = Duration::from_millis(50);
     crate::crossterm::run(tick_rate, receiver)?;
     Ok(())
 }

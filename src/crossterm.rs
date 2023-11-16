@@ -14,7 +14,11 @@ use crossterm::{
 use ratatui::prelude::*;
 use tokio::runtime;
 
-use crate::{app::App, event::WebSocketEvent, event_handlers, ui};
+use crate::{
+    app::{App, MESSAGES},
+    event::WebSocketEvent,
+    event_handlers, ui,
+};
 use std::sync::mpsc::Receiver;
 
 pub fn run(tick_rate: Duration, receiver: Receiver<String>) -> Result<(), Box<dyn Error>> {
@@ -83,6 +87,12 @@ fn run_app<B: Backend>(
 async fn process_messages(receiver: mpsc::Receiver<String>) {
     while let Ok(message) = receiver.recv() {
         if let Ok(event) = serde_json::from_str::<WebSocketEvent>(&message) {
+            {
+                let mut messages = MESSAGES.lock().unwrap();
+                if messages.len() > 500 {
+                    messages.remove(0);
+                }
+            }
             match event {
                 WebSocketEvent::NewMessage {
                     message,
