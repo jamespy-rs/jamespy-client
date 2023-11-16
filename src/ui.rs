@@ -18,6 +18,8 @@ pub fn draw(f: &mut Frame, app: &mut App) {
         .select(app.tabs.index);
     f.render_widget(tabs, chunks[0]);
 
+    // so it shuts up for now.
+    #[allow(clippy::single_match)]
     match app.tabs.index {
         0 => draw_first_tab(f, app, chunks[1]),
         _ => {}
@@ -47,7 +49,7 @@ fn draw_events(f: &mut Frame, app: &mut App, area: Rect) {
         if line.width() <= max_width.into() {
             new_text.push(line)
         } else {
-            let funky = split_line(line.spans, max_width);
+            let funky = split_line(line.spans, max_width.into());
             for fun in funky {
                 new_text.push(fun)
             }
@@ -80,36 +82,46 @@ fn draw_events(f: &mut Frame, app: &mut App, area: Rect) {
     f.render_widget(paragraph, area);
 }
 
-fn split_line(spans: Vec<Span<'_>>, max_width: u16) -> Vec<Line> {
+fn split_line(spans: Vec<Span<'_>>, max_width: usize) -> Vec<Line<'_>> {
     let mut lines: Vec<Line<'_>> = Vec::new();
-    // This is ONE message.
-    // it is just too long to display without split.
-    for span in spans {
-        let chunks: Vec<String> = span.content
-        .chars()
-        .collect::<Vec<char>>()
-        .chunks(max_width.into())
-        .map(|chunk| chunk.iter().collect())
-        .collect();
-        // the span split only after words, not on words, or its just splitting when it shouldn't be.
+    let mut current_line = String::new();
+    let mut current_width = 0;
 
-        for chunk in chunks {
-            let line = Line::from(Span::styled(chunk, span.style));
-            lines.push(line)
+    let mut spans_to_push: Vec<Span> = Vec::new();
 
+    for span in spans.clone() {
+        let span_chars: Vec<char> = span.content.chars().collect();
+
+        for &c in span_chars.iter() {
+            if current_width < max_width {
+                current_line.push(c);
+                current_width += 1;
+            } else {
+                // line is full so clear it.
+                let span = Span::styled(current_line.clone(), span.style);
+                spans_to_push.push(span);
+                lines.push(Line::from(spans_to_push.clone()));
+                current_line.clear();
+                spans_to_push.clear();
+                // add the character to the line.
+                current_line.push(c);
+                current_width = 1;
+            }
         }
-    }    
+        if !current_line.is_empty() {
+            // is not empty, but isn't full either.
+            // We have reached the end of the span.
+            let span = Span::styled(current_line.clone(), span.style);
+            current_line.clear();
+            spans_to_push.push(span);
+        }
+    }
+    let line = Line::from(spans_to_push);
+    lines.push(line);
+
     lines
 }
-//
-/*
-Line::from(vec![
-    Span::styled(span.content, span.style)
-]); */
 
-fn split_string(input: &str, limit: usize) -> Vec<String> {
-    input.chars().collect::<Vec<_>>()
-        .chunks(limit)
-        .map(|chunk| chunk.iter().collect())
-        .collect()
-}
+
+
+

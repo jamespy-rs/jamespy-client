@@ -151,7 +151,7 @@ pub async fn message_edit(
                             embeds_fmt.as_deref().unwrap_or("")
                         )
                     } else {
-                        String::new() 
+                        String::new()
                     };
                     let line_span = Span::styled(
                         format!("{}{}{}", prefix, line, suffix),
