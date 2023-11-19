@@ -60,6 +60,18 @@ pub async fn new_message(
 
         lines.push(text::Line::from(formatted_line));
     }
+    
+    if message.content.is_empty() {
+        lines.push(text::Line::from(vec![
+            Span::styled(
+                format!("[{}] [#{}] ", guild_name, channel_name),
+                Style::default().fg(Color::DarkGray),
+            ),
+            Span::raw(format!("{}:", message.author.name)),
+            Span::styled(format!("{}{}" ,attachments_fmt.as_deref().unwrap_or(""), embeds_fmt.as_deref().unwrap_or("") ),
+            Style::default().fg(Color::Cyan))
+        ]));
+    }
 
     let msg = lines;
 
